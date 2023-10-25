@@ -1,22 +1,227 @@
 <!DOCTYPE html>
 <html lang="es">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title></title>
-		<!-- La utilización de librerías JS y/o CSS externo está PERMITIDO -->
-	</head>
-	<body>
-		<!-- TU CÓDIGO AQUÍ -->
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title></title>
+	<!-- La utilización de librerías JS y/o CSS externo está PERMITIDO -->
+	<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+	<!-- TU CÓDIGO AQUÍ -->
+	<div class=" w-full flex flex-col justify-center items-center l p-1"
+		:class="{ ' h-screen': statusView == 1 }"" x-data="{
+				
+		showInput: false,
+		cantidad: 0,
+		recursoSelected: '',
+		unidad: '',
+		statusView: 1,
+		recursos:  [
+			{
+				id: 1,
+				nombre: 'agua',
+				unidad: 'L'
+			},
+			{
+				
+				id: 2,
+				nombre: 'Pólvora',
+				unidad: 'G'
+			},
+			{
+				
+				id: 3,
+				nombre: 'Gas',
+				unidad: 'TUBO'
+			},
+			{
+				
+				id: 4,
+				nombre: 'Hojas (filo)',
+				unidad: 'UNIDAD'
+			},
+			{
+				
+				id: 5,
+				nombre: 'Equipo maniobras',
+				unidad: 'UNIDAD'
+			}
+		],
+		getResourceById (id)  {
+			 const r = this.recursos.find((element) => element.id == id);
+			 return r;
+		},
+		deleteItemStore(id) {
+			newStore = this.recursoStore.filter((r) => r.id != id );
+			this.recursoStore = newStore;
+		},
+		addStore(detailObj) {
+
+			if(typeof detailObj.cantidad === 'number' ) {
+				alert('La cantidad no es valida')
+				return;
+			}
+			if(detailObj.cantidad <= 0 ) {
+				alert('La cantidad debe ser mayor a 0')
+				return;
+			}
+				this.statusView = 3;
+			 this.recursoStore.push(detailObj);
+		},
+		generateStoreId() {
+	
+			 const  currentIds = this.recursoStore.map((value) => value.id)
+			 const  currentMaxId = Math.max(...currentIds)
+		
+			return !Number.isInteger(currentMaxId) ? 1 : currentMaxId+1 ;
+		},
+		recursoStore: [],
+		
+	 }">
+
+		<div class="max-w-sm rounded overflow-hidden shadow-lg p-3" x-show="statusView == (1 || 2)">
+			<input
+				class="my-2 rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 0 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+				x-text="recursoSelected" placeholder=" " x-show="showInput" type="number" x-model="cantidad"
+				:value="cantidad">
+			<strong x-text="unidad"></strong>
+			<select
+				class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+				x-on:change="selectRecursoEvent($el)" x-data="{
+				selectRecursoEvent: (el) => {
+					cantidad = 0;
+					if(el.value != ''){
+						const recursoData = recursos.find((element) => element.id == el.value);
+						console.log(recursoData);
+						showInput = true;
+						unidad = recursoData.unidad
+	
+					}
+				}
+			}" x-model="recursoSelected">
+				<option value="" disabled>Seleccion recurso</option>
+				<template x-for="recurso in recursos" :key="recurso.id">
+					<option :value="recurso.id" x-text="recurso.nombre"></option>
+				</template>
+			</select>
+
+			<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2" @click="
+				    const date =  new Date();
+					const dd = String(date.getDate()).padStart(2, '0');
+					const mm = String(date.getMonth() + 1).padStart(2, '0'); 
+					const yyyy = date.getFullYear();
+					const today  = yyyy  + '/' + mm  + '/' + dd ;
+
+					addStore({						
+					id: generateStoreId(),
+					id_recurso:  recursoSelected,
+					cantidad: cantidad,
+					fecha_ingreso: today
+
+				})" x-show="showInput">Ingresar</button>
+		</div>
+
+		<div class="flex flex-col  overflow-x-auto no-wrap " x-show="statusView == 3">
+
+			<div class="w-full flex flex-row items-end rounded overflow-hidden shadow-lg p-3">
+				<input
+					class="mx-2 rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 0 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+					x-text="recursoSelected" placeholder=" " x-show="showInput" type="number" x-model="cantidad"
+					:value="cantidad">
+				<strong class="mr-3" x-text="unidad"></strong>
+				<select
+					class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+					x-on:change="selectRecursoEvent($el)" x-data="{
+				selectRecursoEvent: (el) => {
+					cantidad = 0;
+					if(el.value != ''){
+						const recursoData = recursos.find((element) => element.id == el.value);
+						console.log(recursoData);
+						showInput = true;
+						unidad = recursoData.unidad
+	
+					}
+				}
+			}" x-model="recursoSelected">
+					<option value="" disabled>Seleccion recurso</option>
+					<template x-for="recurso in recursos" :key="recurso.id">
+						<option :value="recurso.id" x-text="recurso.nombre"></option>
+					</template>
+				</select>
+
+				<button class="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2" @click="
+				    const date =  new Date();
+					const dd = String(date.getDate()).padStart(2, '0');
+					const mm = String(date.getMonth() + 1).padStart(2, '0'); 
+					const yyyy = date.getFullYear();
+					const today  = yyyy  + '/' + mm  + '/' + dd ;
+
+					addStore({						
+					id: generateStoreId(),
+					id_recurso:  recursoSelected,
+					cantidad: cantidad,
+					fecha_ingreso: today
+
+				})" x-show="showInput">Ingresar</button>
+			</div>
+
+			<div class="sm:-mx-6 lg:-mx-8">
+				<div class="inline-block min-w-full py-2 sm:px-6 lg:px-8">
+					<div class="overflow-x-auto">
+						<table class="min-w-full text-left text-sm font-light">
+							<thead class="border-b font-medium dark:border-neutral-500">
+								<tr>
+									<th scope="col" class="px-6 py-4">#</th>
+									<th scope="col" class="px-6 py-4">Recurso</th>
+									<th scope="col" class="px-6 py-4">Cantidad</th>
+									<th scope="col" class="px-6 py-4">Fecha ingreso</th>
+									<th scope="col" class="px-6 py-4">Eliminar</th>
+								</tr>
+							</thead>
+							<tbody>
+								<template x-for="detail in recursoStore" :key="index">
+									<tr class="border-b dark:border-neutral-500" x-data="{
+											currentResourceData: getResourceById(detail.id_recurso)
+										}">
+										<td class="whitespace-nowrap px-6 py-4 font-medium" x-text="detail.id"></td>
+										<td class="whitespace-nowrap px-6 py-4" x-text=" currentResourceData.nombre">
+										</td>
+										<td class="whitespace-nowrap px-6 py-4"
+											x-text="detail.cantidad + currentResourceData.unidad"></td>
+										<td class="whitespace-nowrap px-6 py-4" x-text="detail.fecha_ingreso"></td>
+										<td class="whitespace-nowrap px-6 py-4 cursor-pointer"
+											@click="deleteItemStore(detail.id)">
+											<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+												fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+												<path
+													d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z" />
+												<path
+													d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z" />
+											</svg>
+										</td>
+									</tr>
+								</template>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
 		<style>
-			/*
-				Incluir CSS en este bloque, en vez de un archivo externo .css, está PERMITIDO
-			*/
+
 		</style>
+		<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 		<script type="text/javascript">
+
+
 			/*
 				Incluir JS en este bloque, en vez de un archivo externo .js, está PERMITIDO
 			*/
 		</script>
-	</body>
+
+</body>
+
 </html>
